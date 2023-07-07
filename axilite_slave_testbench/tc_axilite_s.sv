@@ -31,7 +31,7 @@ module tc(axilite_s_interface axi_intf);
 
     initial begin
         connect();
-        axilite_s_scenario_gen::PKT_NUM = 300;
+        axilite_s_scenario_gen::PKT_NUM = 300;			//set PKT_NUM
 
         fork
             gen.gen();

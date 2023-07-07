@@ -58,14 +58,14 @@ endclass
 
 typedef mailbox #(axilite_s_scenario) mb_axi;
 
-class axilite_s_scenario_gen;
+class axilite_s_scenario_gen;		//generator
     axilite_s_scenario scnr;
     mb_axi mb_scnr[2];
     static int PKT_NUM;
 
     function new(mb_axi mb_scn2drvr, mb_scn2scrbd);
-        this.mb_scnr[0] = mb_scn2drvr;
-        this.mb_scnr[1] = mb_scn2scrbd;
+        this.mb_scnr[0] = mb_scn2drvr;		//scenario_gen to driver
+        this.mb_scnr[1] = mb_scn2scrbd;		//scenario_gen to scoreboard
     endfunction
 
    task gen();
