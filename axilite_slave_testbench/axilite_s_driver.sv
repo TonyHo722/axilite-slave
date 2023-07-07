@@ -3,6 +3,8 @@
 
 //20230707 
 //1. use #0 for testbench update value
+//2. issue axi_awvalid & axi_wvalid at the same time
+//3. set axi_awvalid=1 in next T after write data complete 
 
 parameter BUS_DELAY = 1ns;
 
@@ -41,47 +43,51 @@ class axilite_s_driver;
             end
         end
 
+		@(posedge intf.axi_aclk);
         fork
             while(1)begin
                 if(wr_q.size() != 0)begin
                     wr_tr = wr_q.pop_front();		//get wr_q
-                    fork // write
-                        begin // wr addr
-                            @(posedge intf.axi_aclk);
-                            intf.axi_awaddr = #0 wr_tr.wr_addr;
-                            intf.axi_awvalid = #0 1;
-                            
-                            while(1)begin
-                                @(posedge intf.axi_aclk);
-                                if(intf.axi_awready === 1'b1)begin
-                                    //#(BUS_DELAY);			//Can we remove the delay?
-                                    intf.axi_awaddr = #0 0;
-                                    intf.axi_awvalid = #0 0;
-                                    break;
-                                end
-                            end
-                        end
+					begin // write addr and data
+						intf.axi_awaddr = #0 wr_tr.wr_addr;
+						intf.axi_awvalid = #0 1;
+						intf.axi_wdata = #0 wr_tr.wr_data;
+						intf.axi_wstrb = #0 wr_tr.wr_strb;
+						intf.axi_wvalid = #0 1;
+						$display($sformatf("[INFO] %6t write addr and data trans %6d", $time(), wr_tr.trans_id));
+						fork 
+							begin
+								// wait for axi_awready
+								while(1)begin
+									@(posedge intf.axi_aclk);
+									if(intf.axi_awready === 1'b1)begin
+										//#(BUS_DELAY);			//Can we remove the delay? -> yes use #0 to avoid race condition.
+										intf.axi_awaddr = #0 0;
+										intf.axi_awvalid = #0 0;
+										$display($sformatf("[INFO] %6t axi_awready==1 trans %6d", $time(), wr_tr.trans_id));
+										break;
+									end
+								end
+							end
+							begin
+								// wait for axi_wready
+								while(1)begin
+									@(posedge intf.axi_aclk);
+									if(intf.axi_wready === 1'b1)begin
+										//#(BUS_DELAY);
+										intf.axi_wdata = #0 0;
+										intf.axi_wstrb = #0 0;
+										intf.axi_wvalid = #0 0;
+										$display($sformatf("[INFO] %6t axi_wready==1 trans %6d", $time(), wr_tr.trans_id));
+										break;
+									end
+								end
+							end
+						join
 
-                        begin // wr data
-                            @(posedge intf.axi_aclk);
-                            intf.axi_wdata = #0 wr_tr.wr_data;
-                            intf.axi_wstrb = #0 wr_tr.wr_strb;
-                            intf.axi_wvalid = #0 1;
-                            
-                            while(1)begin
-                                @(posedge intf.axi_aclk);
-                                if(intf.axi_wready === 1'b1)begin
-                                    //#(BUS_DELAY);
-                                    intf.axi_wdata = #0 0;
-                                    intf.axi_wstrb = #0 0;
-                                    intf.axi_wvalid = #0 0;
-                                    break;
-                                end
-                            end
-                        end
-                    join
+					end
 
-                    repeat($urandom_range(5)) @(posedge intf.axi_aclk);
+                    //repeat($urandom_range(5)) @(posedge intf.axi_aclk);
                     //break;
                 end
                 else begin
