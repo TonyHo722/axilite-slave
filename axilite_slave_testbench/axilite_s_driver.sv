@@ -1,6 +1,9 @@
 `define dut top.axilite_s
 //event evt_wr_addr, evt_wr_data;
 
+//20230707 
+//1. use #0 for testbench update value
+
 parameter BUS_DELAY = 1ns;
 
 class axilite_s_driver;
@@ -45,15 +48,15 @@ class axilite_s_driver;
                     fork // write
                         begin // wr addr
                             @(posedge intf.axi_aclk);
-                            intf.axi_awaddr = wr_tr.wr_addr;
-                            intf.axi_awvalid = 1;
+                            intf.axi_awaddr = #0 wr_tr.wr_addr;
+                            intf.axi_awvalid = #0 1;
                             
                             while(1)begin
                                 @(posedge intf.axi_aclk);
                                 if(intf.axi_awready === 1'b1)begin
-                                    #(BUS_DELAY);			//Can we remove the delay?
-                                    intf.axi_awaddr = 0;
-                                    intf.axi_awvalid = 0;
+                                    //#(BUS_DELAY);			//Can we remove the delay?
+                                    intf.axi_awaddr = #0 0;
+                                    intf.axi_awvalid = #0 0;
                                     break;
                                 end
                             end
@@ -61,17 +64,17 @@ class axilite_s_driver;
 
                         begin // wr data
                             @(posedge intf.axi_aclk);
-                            intf.axi_wdata = wr_tr.wr_data;
-                            intf.axi_wstrb = wr_tr.wr_strb;
-                            intf.axi_wvalid = 1;
+                            intf.axi_wdata = #0 wr_tr.wr_data;
+                            intf.axi_wstrb = #0 wr_tr.wr_strb;
+                            intf.axi_wvalid = #0 1;
                             
                             while(1)begin
                                 @(posedge intf.axi_aclk);
                                 if(intf.axi_wready === 1'b1)begin
-                                    #(BUS_DELAY);
-                                    intf.axi_wdata = 0;
-                                    intf.axi_wstrb = 0;
-                                    intf.axi_wvalid = 0;
+                                    //#(BUS_DELAY);
+                                    intf.axi_wdata = #0 0;
+                                    intf.axi_wstrb = #0 0;
+                                    intf.axi_wvalid = #0 0;
                                     break;
                                 end
                             end
