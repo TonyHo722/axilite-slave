@@ -4,19 +4,21 @@
 // ORGANIZATION: fsic
 //      CREATED: 2023/05/16
 ///////////////////////////////////////////////////////////////////////////////
+//20230722
+//1. rename variable for more readable in this project
 
 class axilite_s_monitor;
     virtual axilite_s_interface.master intf;
-    axilite_s_scenario scnr_mon[2];
-    mb_axi mb_mon;
+    axilite_s_scenario scnr_mon_wr, scnr_mon_rd;
+    mb_axi mb_mon2scrbd;
     logic [11:0] wr_addr, rd_addr;
     logic [31:0] wr_data, rd_data;
     logic [3:0] wr_strb;
     int packet_cnt = 0;
 
-    function new(virtual axilite_s_interface.master intf, mb_axi mb_mon);
+    function new(virtual axilite_s_interface.master intf, mb_axi mb_mon2scrbd);
         this.intf = intf;
-        this.mb_mon = mb_mon;
+        this.mb_mon2scrbd = mb_mon2scrbd;
     endfunction
 
     virtual task bus_mon();
@@ -38,13 +40,13 @@ class axilite_s_monitor;
                         end
                     end
 
-                    scnr_mon[0] = new();
-                    scnr_mon[0].wr_addr = wr_addr;
-                    scnr_mon[0].wr_data = wr_data;
-                    scnr_mon[0].wr_strb = wr_strb;
-                    scnr_mon[0].axi_op = AXI_WR;
-                    scnr_mon[0].display("scnr_mon[0]");
-                    mb_mon.put(scnr_mon[0]);
+                    scnr_mon_wr = new();
+                    scnr_mon_wr.wr_addr = wr_addr;
+                    scnr_mon_wr.wr_data = wr_data;
+                    scnr_mon_wr.wr_strb = wr_strb;
+                    scnr_mon_wr.axi_op = AXI_WR;
+                    scnr_mon_wr.display("scnr_mon_wr");
+                    mb_mon2scrbd.put(scnr_mon_wr);
                     packet_cnt +=1;
                 end
                 
@@ -71,12 +73,12 @@ class axilite_s_monitor;
                             end
                         end
                     join
-                    scnr_mon[1] = new();
-                    scnr_mon[1].rd_addr = rd_addr;
-                    scnr_mon[1].rd_data = rd_data;
-                    scnr_mon[1].axi_op = AXI_RD;
-                    scnr_mon[1].display("scnr_mon[1]");
-                    mb_mon.put(scnr_mon[1]);
+                    scnr_mon_rd = new();
+                    scnr_mon_rd.rd_addr = rd_addr;
+                    scnr_mon_rd.rd_data = rd_data;
+                    scnr_mon_rd.axi_op = AXI_RD;
+                    scnr_mon_rd.display("scnr_mon_rd");
+                    mb_mon2scrbd.put(scnr_mon_rd);
                     packet_cnt +=1;
                 end
                 
