@@ -12,6 +12,7 @@
 //1. use NBA in driver to update value
 //2. change Read part to NBA in driver
 //3. remove dummy code - this.scnr_drvr = scnr_drvr
+//4. rename from scnr_drvr to scnr for more readable in this project
 //20230707 
 //1. use #0 for testbench update value
 //2. issue axi_awvalid & axi_wvalid at the same time
@@ -21,7 +22,7 @@ parameter BUS_DELAY = 1ns;
 
 class axilite_s_driver;
     virtual axilite_s_interface.master intf;
-    axilite_s_scenario scnr_drvr;
+    axilite_s_scenario scnr;
     mb_axi mb_drvr;
     axilite_s_scenario wr_q[$], rd_q[$], wr_tr, rd_tr;
 
@@ -42,15 +43,15 @@ class axilite_s_driver;
 
         //while(1)begin
         for(int i=0; i < axilite_s_scenario_gen::PKT_NUM; i++)begin
-            scnr_drvr = new();
-            mb_drvr.get(scnr_drvr);
-            scnr_drvr.display();
+            scnr = new();
+            mb_drvr.get(scnr);
+            scnr.display();
             //-> top.evt_001;
-            if(scnr_drvr.axi_op == AXI_WR)begin
-                wr_q.push_back(scnr_drvr);		//push to wr_q
+            if(scnr.axi_op == AXI_WR)begin
+                wr_q.push_back(scnr);		//push to wr_q
             end
             else begin
-                rd_q.push_back(scnr_drvr);		//push to rd_q
+                rd_q.push_back(scnr);		//push to rd_q
             end
         end
 
