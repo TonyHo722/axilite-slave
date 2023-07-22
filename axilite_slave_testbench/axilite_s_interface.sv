@@ -33,7 +33,7 @@ interface axilite_s_interface();
     logic [31:0] bk_rdata;
     logic bk_rdone;
 
-    modport master(
+    modport master(		//axilite master interface 
         input axi_aclk,
         input axi_aresetn,
         input axi_awready,
@@ -57,11 +57,11 @@ interface axilite_s_interface();
         output bk_wdone,
         input bk_rstart,
         input bk_raddr,
-        output bk_rdata,
-        output bk_rdone
+        output bk_rdata,		//axilite master interface provide bk_rdata
+        output bk_rdone			//axilite master interface provide bk_rdone
     );
 
-    modport slave(
+    modport slave(				//axilite slave interface
         input axi_aclk,
         input axi_aresetn,
         input axi_awvalid,

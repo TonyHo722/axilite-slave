@@ -10,6 +10,7 @@
 
 //20230722 
 //1. use NBA in driver to update value
+//2. change Read part to NBA in driver
 //20230707 
 //1. use #0 for testbench update value
 //2. issue axi_awvalid & axi_wvalid at the same time
@@ -108,60 +109,46 @@ class axilite_s_driver;
                     rd_tr = rd_q.pop_front();
                     fork // read
                         begin // rd addr
-                            @(posedge intf.axi_aclk);
-                            intf.axi_araddr = rd_tr.rd_addr;
-                            intf.axi_arvalid = 1;
+                            intf.axi_araddr <= rd_tr.rd_addr;
+                            intf.axi_arvalid <= 1;
                             
                             while(1)begin
                                 @(posedge intf.axi_aclk);
                                 if(intf.axi_arready === 1'b1)begin
-                                    #(BUS_DELAY);
-                                    intf.axi_araddr = 0;
-                                    intf.axi_arvalid = 0;
+                                    intf.axi_araddr <= 0;
+                                    intf.axi_arvalid <= 0;
                                     break;
                                 end
                             end
                         end
 
-                        begin // rd ready
+                        begin // rd data ready
                             while(1)begin
                                 @(posedge intf.axi_aclk);
-                                if(intf.axi_rready == 0)begin
-                                    #(BUS_DELAY);
-                                    if($urandom_range(1))
-                                        intf.axi_rready = 1;
-                                end
-                                 @(posedge intf.axi_aclk);
-                                if(intf.axi_rready == 1)begin
-                                    if(intf.axi_rvalid === 1)begin
-                                        #(BUS_DELAY);
-                                        if($urandom_range(1))
-                                            intf.axi_rready = 0;
-                                        break;
-                                    end
-                                end
-                            end
+                                if(intf.axi_rvalid)begin
+									repeat($urandom_range(5)) @(posedge intf.axi_aclk);
+									intf.axi_rready <= 1;
+									@(posedge intf.axi_aclk);	
+									intf.axi_rready <= 0;
+                                    break;
+								end
+							end
                         end
 
-                        begin // rd data
-                            //@(posedge intf.axi_aclk);
-                            //Willy debug - s
+                        begin // provide rd data in bk
                             while(1)begin
                                 @(posedge intf.axi_aclk);
                                 if(intf.bk_rstart === 1'b1)begin
-                                    #(BUS_DELAY);
-                                    intf.bk_rdata = rd_tr.rd_data;
-                                    intf.bk_rdone = 1;
+									repeat($urandom_range(5)) @(posedge intf.axi_aclk);
+                                    intf.bk_rdata <= rd_tr.rd_data;		//axilite master interface provide bk_rdata
+                                    intf.bk_rdone <= 1;					//axilite master interface provide bk_rdone
         
                                     @(posedge intf.axi_aclk);
-                                    #(BUS_DELAY);
-                                    intf.bk_rdata = 0;
-                                    intf.bk_rdone = 0;
-                                    
+                                    //intf.bk_rdata <= 0;
+                                    intf.bk_rdone <= 0;
                                     break;
                                 end
                             end
-                            //Willy debug - e
                         end
                     join
 
@@ -186,7 +173,7 @@ class axilite_s_driver;
     endtask
 
     virtual task init_bus();
-        intf.bk_wdone = 0;
+        intf.bk_wdone = 0;		//no used now
         intf.bk_rdata = 0;
         intf.bk_rdone = 0;
 

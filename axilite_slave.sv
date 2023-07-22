@@ -230,8 +230,8 @@ module axilite_slave(
 
 
             if(bk_rdone == 1'b1) begin
-                cache_rdone <= bk_rdone;
-                cache_rdata <= bk_rdata;
+                cache_rdone <= bk_rdone;		//axilite master interface provide bk_rdone
+                cache_rdata <= bk_rdata;		//axilite master interface provide bk_rdata
             end
 
             //Slave return data, and master claim it:  axi_rvalid = 1, axi_rready = 1
@@ -252,7 +252,7 @@ module axilite_slave(
         bk_rstart = 1'b0;
         bk_raddr = 12'b0;
         
-        if(cache_wstart == 1'b1) begin
+        if(cache_wstart == 1'b1) begin		//TODO : direct connect
             bk_waddr = cache_waddr;
             bk_wdata = cache_wdata;
             bk_wstrb = cache_strb;
