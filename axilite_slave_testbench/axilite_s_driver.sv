@@ -11,6 +11,7 @@
 //20230722 
 //1. use NBA in driver to update value
 //2. change Read part to NBA in driver
+//3. remove dummy code - this.scnr_drvr = scnr_drvr
 //20230707 
 //1. use #0 for testbench update value
 //2. issue axi_awvalid & axi_wvalid at the same time
@@ -26,7 +27,7 @@ class axilite_s_driver;
 
     function new(virtual axilite_s_interface.master intf, mb_axi mb_drvr);
         this.intf = intf;
-        this.scnr_drvr = scnr_drvr;
+        //this.scnr_drvr = scnr_drvr;
         this.mb_drvr = mb_drvr;
     endfunction
 
