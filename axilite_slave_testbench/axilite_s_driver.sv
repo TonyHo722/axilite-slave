@@ -8,6 +8,8 @@
 `define dut top.axilite_s
 //event evt_wr_addr, evt_wr_data;
 
+//20230722 
+//1. use NBA in driver to update value
 //20230707 
 //1. use #0 for testbench update value
 //2. issue axi_awvalid & axi_wvalid at the same time
@@ -56,11 +58,11 @@ class axilite_s_driver;
                 if(wr_q.size() != 0)begin
                     wr_tr = wr_q.pop_front();		//get wr_q
 					begin // write addr and data
-						intf.axi_awaddr = #0 wr_tr.wr_addr;
-						intf.axi_awvalid = #0 1;
-						intf.axi_wdata = #0 wr_tr.wr_data;
-						intf.axi_wstrb = #0 wr_tr.wr_strb;
-						intf.axi_wvalid = #0 1;
+						intf.axi_awaddr <= wr_tr.wr_addr;
+						intf.axi_awvalid <= 1;
+						intf.axi_wdata <= wr_tr.wr_data;
+						intf.axi_wstrb <= wr_tr.wr_strb;
+						intf.axi_wvalid <= 1;
 						$display($sformatf("[INFO] %6t write addr and data trans %6d", $time(), wr_tr.trans_id));
 						fork 
 							begin
@@ -68,9 +70,8 @@ class axilite_s_driver;
 								while(1)begin
 									@(posedge intf.axi_aclk);
 									if(intf.axi_awready === 1'b1)begin
-										//#(BUS_DELAY);			//Can we remove the delay? -> yes use #0 to avoid race condition.
-										intf.axi_awaddr = #0 0;
-										intf.axi_awvalid = #0 0;
+										intf.axi_awaddr <= 0;
+										intf.axi_awvalid <= 0;
 										$display($sformatf("[INFO] %6t axi_awready==1 trans %6d", $time(), wr_tr.trans_id));
 										break;
 									end
@@ -82,9 +83,9 @@ class axilite_s_driver;
 									@(posedge intf.axi_aclk);
 									if(intf.axi_wready === 1'b1)begin
 										//#(BUS_DELAY);
-										intf.axi_wdata = #0 0;
-										intf.axi_wstrb = #0 0;
-										intf.axi_wvalid = #0 0;
+										intf.axi_wdata <= 0;
+										intf.axi_wstrb <= 0;
+										intf.axi_wvalid <= 0;
 										$display($sformatf("[INFO] %6t axi_wready==1 trans %6d", $time(), wr_tr.trans_id));
 										break;
 									end
