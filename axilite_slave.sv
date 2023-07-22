@@ -4,6 +4,8 @@
 // ORGANIZATION: fsic
 //      CREATED: 2023/05/16
 ///////////////////////////////////////////////////////////////////////////////
+//20230722
+//1.direct connect cache_* to bk_* 
 
 module axilite_slave(
     // frontend - axilite slave
@@ -244,25 +246,14 @@ module axilite_slave(
     
      // backend interface, combinational logic   
     always_comb begin
-        bk_waddr = 12'b0;
-        bk_wdata = 32'b0;
-        bk_wstrb = 4'b0;
-        bk_wstart = 1'b0;
         
-        bk_rstart = 1'b0;
-        bk_raddr = 12'b0;
-        
-        if(cache_wstart == 1'b1) begin		//TODO : direct connect
-            bk_waddr = cache_waddr;
-            bk_wdata = cache_wdata;
-            bk_wstrb = cache_strb;
-            bk_wstart = 1;
-        end
-        
-        if(cache_rstart == 1'b1) begin
-            bk_raddr = cache_raddr;
-            bk_rstart = 1;
-        end
+        bk_waddr = cache_waddr;
+        bk_wdata = cache_wdata;
+        bk_wstrb = cache_strb;
+        bk_wstart = cache_wstart;
+
+        bk_raddr = cache_raddr;
+        bk_rstart = cache_rstart;
        
     end
 
