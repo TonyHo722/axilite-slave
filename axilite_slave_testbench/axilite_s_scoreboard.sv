@@ -4,52 +4,54 @@
 // ORGANIZATION: fsic
 //      CREATED: 2023/05/16
 ///////////////////////////////////////////////////////////////////////////////
+//20230722
+//1. rename variable for more readable in this project
 
 class axilite_s_scoreboard;
     virtual axilite_s_interface.master intf;
-    axilite_s_scenario scnr_scrbd[2];
-    mb_axi mb_scrbd[2];
+    axilite_s_scenario scnr_gen, scnr_mon;
+    mb_axi mb_gen2scrbd, mb_mon2scrbd;
     static int succ_cnt, fail_cnt;
-    axilite_s_scenario scn_wr_tr_q[$], scn_rd_tr_q[$], mon_wr_tr_q[$], mon_rd_tr_q[$], scn_wr_tr, scn_rd_tr, mon_wr_tr, mon_rd_tr;
+    axilite_s_scenario gen_wr_tr_q[$], gen_rd_tr_q[$], mon_wr_tr_q[$], mon_rd_tr_q[$], gen_wr_tr, gen_rd_tr, mon_wr_tr, mon_rd_tr;
 
-    function new(virtual axilite_s_interface.master intf, mb_axi mb_gen, mb_mon);
+    function new(virtual axilite_s_interface.master intf, mb_axi mb_gen2scrbd, mb_axi mb_mon2scrbd);
         this.intf = intf;                         
-        this.mb_scrbd[0] = mb_gen;
-        this.mb_scrbd[1] = mb_mon;
+        this.mb_gen2scrbd = mb_gen2scrbd;
+        this.mb_mon2scrbd = mb_mon2scrbd;
     endfunction
 
     virtual task compare_trans();
         fork
             // get trans, put in queue
             while(1)begin
-                mb_scrbd[0].get(scnr_scrbd[0]);
-                if(scnr_scrbd[0].axi_op == AXI_WR)begin
-                    scn_wr_tr_q.push_back(scnr_scrbd[0]);
+                mb_gen2scrbd.get(scnr_gen);
+                if(scnr_gen.axi_op == AXI_WR)begin
+                    gen_wr_tr_q.push_back(scnr_gen);
                 end
                 else
-                    scn_rd_tr_q.push_back(scnr_scrbd[0]);
+                    gen_rd_tr_q.push_back(scnr_gen);
             end
 
             while(1)begin
-                mb_scrbd[1].get(scnr_scrbd[1]);
-                if(scnr_scrbd[1].axi_op == AXI_WR)begin
-                    mon_wr_tr_q.push_back(scnr_scrbd[1]);
+                mb_mon2scrbd.get(scnr_mon);
+                if(scnr_mon.axi_op == AXI_WR)begin
+                    mon_wr_tr_q.push_back(scnr_mon);
                 end
                 else
-                    mon_rd_tr_q.push_back(scnr_scrbd[1]);
+                    mon_rd_tr_q.push_back(scnr_mon);
             end
 
             while(1)begin
-                if((scn_wr_tr_q.size() != 0) && (mon_wr_tr_q.size() != 0))begin
-                    scn_wr_tr = scn_wr_tr_q.pop_front();
+                if((gen_wr_tr_q.size() != 0) && (mon_wr_tr_q.size() != 0))begin
+                    gen_wr_tr = gen_wr_tr_q.pop_front();
                     mon_wr_tr = mon_wr_tr_q.pop_front();
-                    if(scn_wr_tr.compare(mon_wr_tr))begin
-                        $display($sformatf("trans %6d compare ok", scn_wr_tr.trans_id));
+                    if(gen_wr_tr.compare(mon_wr_tr))begin
+                        $display($sformatf("trans %6d compare ok", gen_wr_tr.trans_id));
                         succ_cnt +=1;
                     end
                     else begin
-                        $display($sformatf("[ERROR] %6t trans %6d compare fail", $time(), scn_wr_tr.trans_id));
-                        scn_wr_tr.display();
+                        $display($sformatf("[ERROR] %6t trans %6d compare fail", $time(), gen_wr_tr.trans_id));
+                        gen_wr_tr.display();
                         mon_wr_tr.display();
                         fail_cnt +=1;
                     end
@@ -60,16 +62,16 @@ class axilite_s_scoreboard;
             end
 
             while(1)begin
-                if((scn_rd_tr_q.size() != 0) && (mon_rd_tr_q.size() != 0))begin
-                    scn_rd_tr = scn_rd_tr_q.pop_front();
+                if((gen_rd_tr_q.size() != 0) && (mon_rd_tr_q.size() != 0))begin
+                    gen_rd_tr = gen_rd_tr_q.pop_front();
                     mon_rd_tr = mon_rd_tr_q.pop_front();
-                    if(scn_rd_tr.compare(mon_rd_tr))begin
-                        $display($sformatf("trans %6d compare ok", scn_rd_tr.trans_id));
+                    if(gen_rd_tr.compare(mon_rd_tr))begin
+                        $display($sformatf("trans %6d compare ok", gen_rd_tr.trans_id));
                         succ_cnt +=1;
                     end
                     else begin
-                        $display($sformatf("[ERROR] %6t trans %6d compare fail", $time(), scn_rd_tr.trans_id));
-                        scn_rd_tr.display();
+                        $display($sformatf("[ERROR] %6t trans %6d compare fail", $time(), gen_rd_tr.trans_id));
+                        gen_rd_tr.display();
                         mon_rd_tr.display();
                         fail_cnt +=1;
                     end
