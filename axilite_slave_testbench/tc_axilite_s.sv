@@ -4,6 +4,8 @@
 // ORGANIZATION: fsic
 //      CREATED: 2023/05/16
 ///////////////////////////////////////////////////////////////////////////////
+//20230722
+//1. rename variable for more readable in this project
 
 
 `timescale 1ns/1ns
@@ -20,21 +22,21 @@ module tc(axilite_s_interface axi_intf);
     axilite_s_driver drvr;
     axilite_s_monitor mon;
     axilite_s_scoreboard scrbd;
-    mb_axi gen2drvr, gen2scrbd, mon2scrbd;
+    mb_axi mb_gen2drvr, mb_gen2scrbd, mb_mon2scrbd;
 
     //constraint axi_scenario::op_limit{
     //    //axi_op == AXI_WR;
     //}
 
     function void connect();
-        gen2drvr = new();
-        gen2scrbd = new();
-        mon2scrbd = new();
+        mb_gen2drvr = new();
+        mb_gen2scrbd = new();
+        mb_mon2scrbd = new();
 
-        gen = new(gen2drvr, gen2scrbd);
-        drvr = new(axi_intf.master, gen2drvr);
-        mon = new(axi_intf.master, mon2scrbd);
-        scrbd = new(axi_intf.master, gen2scrbd, mon2scrbd);
+        gen = new(mb_gen2drvr, mb_gen2scrbd);
+        drvr = new(axi_intf.master, mb_gen2drvr);
+        mon = new(axi_intf.master, mb_mon2scrbd);
+        scrbd = new(axi_intf.master, mb_gen2scrbd, mb_mon2scrbd);
     endfunction
 
     initial begin

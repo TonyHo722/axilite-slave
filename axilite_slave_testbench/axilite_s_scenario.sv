@@ -4,6 +4,8 @@
 // ORGANIZATION: fsic
 //      CREATED: 2023/05/16
 ///////////////////////////////////////////////////////////////////////////////
+//20230722
+//1. rename variable for more readable in this project
 
 
 typedef enum bit [3:0] {AXI_WR, AXI_RD} axi_operation;
@@ -68,12 +70,12 @@ typedef mailbox #(axilite_s_scenario) mb_axi;
 
 class axilite_s_scenario_gen;		//generator
     axilite_s_scenario scnr;
-    mb_axi mb_scnr[2];
+    mb_axi mb_gen2drvr, mb_gen2scrbd;
     static int PKT_NUM;
 
-    function new(mb_axi mb_scn2drvr, mb_scn2scrbd);
-        this.mb_scnr[0] = mb_scn2drvr;		//scenario_gen to driver
-        this.mb_scnr[1] = mb_scn2scrbd;		//scenario_gen to scoreboard
+    function new(mb_axi mb_gen2drvr, mb_gen2scrbd);
+        this.mb_gen2drvr = mb_gen2drvr;		//scenario_gen to driver
+        this.mb_gen2scrbd = mb_gen2scrbd;		//scenario_gen to scoreboard
     endfunction
 
    task gen();
@@ -81,8 +83,8 @@ class axilite_s_scenario_gen;		//generator
             scnr = new();
             scnr.randomize();
             //scnr.display();
-            mb_scnr[0].put(scnr);
-            mb_scnr[1].put(scnr);
+            mb_gen2drvr.put(scnr);
+            mb_gen2scrbd.put(scnr);
         end
     endtask
 endclass

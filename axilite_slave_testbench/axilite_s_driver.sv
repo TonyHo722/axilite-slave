@@ -13,6 +13,7 @@
 //2. change Read part to NBA in driver
 //3. remove dummy code - this.scnr_drvr = scnr_drvr
 //4. rename from scnr_drvr to scnr for more readable in this project
+//5. rename from mb_drvr to mb_gen2drvr for more readable in this project
 //20230707 
 //1. use #0 for testbench update value
 //2. issue axi_awvalid & axi_wvalid at the same time
@@ -23,13 +24,13 @@ parameter BUS_DELAY = 1ns;
 class axilite_s_driver;
     virtual axilite_s_interface.master intf;
     axilite_s_scenario scnr;
-    mb_axi mb_drvr;
-    axilite_s_scenario wr_q[$], rd_q[$], wr_tr, rd_tr;
+    mb_axi mb_gen2drvr;
+    axilite_s_scenario wr_q[$], rd_q[$], wr_tr, rd_tr;		//[Tony] what is wr_q[$]?
 
-    function new(virtual axilite_s_interface.master intf, mb_axi mb_drvr);
+    function new(virtual axilite_s_interface.master intf, mb_axi mb_gen2drvr);
         this.intf = intf;
         //this.scnr_drvr = scnr_drvr;
-        this.mb_drvr = mb_drvr;
+        this.mb_gen2drvr = mb_gen2drvr;
     endfunction
 
     virtual task bus_op();
@@ -44,7 +45,7 @@ class axilite_s_driver;
         //while(1)begin
         for(int i=0; i < axilite_s_scenario_gen::PKT_NUM; i++)begin
             scnr = new();
-            mb_drvr.get(scnr);
+            mb_gen2drvr.get(scnr);
             scnr.display();
             //-> top.evt_001;
             if(scnr.axi_op == AXI_WR)begin
