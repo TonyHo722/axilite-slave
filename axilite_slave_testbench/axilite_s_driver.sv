@@ -23,9 +23,8 @@ parameter BUS_DELAY = 1ns;
 
 class axilite_s_driver;
     virtual axilite_s_interface.master intf;
-    axilite_s_scenario scnr;
     mb_axi mb_gen2drvr;
-    axilite_s_scenario wr_q[$], rd_q[$], wr_tr, rd_tr;		//[Tony] what is wr_q[$]?
+    axilite_s_scenario scnr, wr_q[$], rd_q[$], wr_tr, rd_tr;		//[Tony] what is wr_q[$]? [Answer] SystemVerilog队列及数组方法 https://zhuanlan.zhihu.com/p/358807792
 
     function new(virtual axilite_s_interface.master intf, mb_axi mb_gen2drvr);
         this.intf = intf;

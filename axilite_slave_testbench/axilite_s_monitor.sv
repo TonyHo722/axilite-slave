@@ -29,7 +29,7 @@ class axilite_s_monitor;
                 while(1)begin // wr
                     while(1)begin
                         @(posedge intf.axi_aclk);
-                        -> top.evt_001;
+                        -> top.evt_001;		//[Tony] What it is? -> top.evt_001; [Answer] SV进程之间的通信 evt_001
 
                         // write addr
                         if(intf.bk_wstart === 1)begin
